@@ -83,7 +83,6 @@ const studentSchema = new mongoose.Schema(
       idNumber: {
         type: String,
         required: true,
-        unique: true,
         trim: true,
       },
 

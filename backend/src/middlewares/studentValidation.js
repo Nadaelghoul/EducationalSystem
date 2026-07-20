@@ -1,5 +1,4 @@
 const { body, validationResult } = require("express-validator");
-const Student = require("../models/Student");
 
 const studentValidation = [
   // Personal Information
@@ -89,14 +88,6 @@ body("personalInfo.englishFullName")
       if (value.trim().length < 4) {
         throw new Error("رقم جواز السفر غير صحيح");
       }
-    }
-
-    const existingStudent = await Student.findOne({
-      "personalInfo.idNumber": value,
-    });
-
-    if (existingStudent) {
-      throw new Error("الرقم القومي أو جواز السفر موجود بالفعل");
     }
 
     return true;

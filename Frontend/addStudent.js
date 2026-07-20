@@ -334,9 +334,6 @@ function validateCurrentStepFields(form, fields) {
         } else if (!/^\d{14}$/.test(value)) {
           showFieldError(field, "الرقم القومي يجب أن يكون 14 رقم");
           hasErrors = true;
-        } else if (isDuplicateIdNumber(value)) {
-          showFieldError(field, "هذا الرقم موجود بالفعل");
-          hasErrors = true;
         } else {
           clearFieldError(field);
         }
@@ -346,9 +343,6 @@ function validateCurrentStepFields(form, fields) {
           hasErrors = true;
         } else if (value.length < 4) {
           showFieldError(field, "رقم جواز السفر غير صحيح");
-          hasErrors = true;
-        } else if (isDuplicateIdNumber(value)) {
-          showFieldError(field, "هذا الرقم موجود بالفعل");
           hasErrors = true;
         } else {
           clearFieldError(field);
@@ -398,11 +392,6 @@ function validateCurrentStepFields(form, fields) {
 
   return !hasErrors;
 }
-
-function isDuplicateIdNumber(value) {
-  return false;
-}
-
 function showFieldError(field, message) {
   const wrapper = field.closest(".field");
   const errorEl = wrapper?.querySelector(".field__error");
