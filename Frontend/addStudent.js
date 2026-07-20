@@ -1,6 +1,6 @@
 "use strict";
 
-const API_ENDPOINT = " https://catering-backfield-subdivide.ngrok-free.dev/api/students";
+const API_ENDPOINT = "http://localhost:3000/api/students";
 
 const DEMO_MODE = false;
 
