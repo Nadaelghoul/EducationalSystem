@@ -1,10 +1,10 @@
 "use strict";
-const API_BASE = "/api/students"; // غيّر ده لرابط الـ API بتاعك
+const API_BASE = `${SERVER_URL}/api/students`; // غيّر ده لرابط الـ API بتاعك
 const EDIT_URL_BASE = "/students/edit"; // غيّر ده لمسار صفحة تعديل الطالب
-const ADD_STUDENT_URL = "index.html"; // غيّر ده لمسار صفحة إضافة طالب
+const ADD_STUDENT_URL = "addStudent.html"; // غيّر ده لمسار صفحة إضافة طالب
 const EDIT_STUDENT_URL = "/students/edit"; // غيّر ده لمسار صفحة اختيار طالب للتعديل
 
-const DEMO_MODE = true;
+const DEMO_MODE = false;
 
 const state = {
   all: [],

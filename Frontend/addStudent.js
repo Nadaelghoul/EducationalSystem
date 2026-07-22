@@ -1,6 +1,6 @@
 "use strict";
 
-const API_ENDPOINT = "http://localhost:3000/api/students";
+const API_ENDPOINT = `${SERVER_URL}/api/students`;
 
 const DEMO_MODE = false;
 
@@ -8,8 +8,23 @@ document.addEventListener("DOMContentLoaded", () => {
   initSidebarToggle();
   initThemeToggle();
   initConditionalFields();
+  initPasswordToggle();
   initWizard();
 });
+
+function initPasswordToggle() {
+  const passwordInput = document.getElementById("password");
+  const toggleButton = document.getElementById("togglePassword");
+  const toggleIcon = document.getElementById("togglePasswordIcon");
+
+  if (!passwordInput || !toggleButton || !toggleIcon) return;
+
+  toggleButton.addEventListener("click", () => {
+    const isHidden = passwordInput.type === "password";
+    passwordInput.type = isHidden ? "text" : "password";
+    toggleIcon.className = isHidden ? "fa-solid fa-eye-slash" : "fa-solid fa-eye";
+  });
+}
 
 function initThemeToggle() {
   const toggleBtn = document.getElementById("themeToggleBtn");
@@ -129,7 +144,6 @@ function initWizard() {
   const continueBtn = document.getElementById("continueBtn");
   const backStepBtn = document.getElementById("backStepBtn");
   const saveBtn = document.getElementById("saveBtn");
-
   if (!form) return;
 
   form.querySelectorAll("input, select").forEach((el) => {
@@ -139,25 +153,45 @@ function initWizard() {
 
   goToStep(1);
 
-  continueBtn?.addEventListener("click", () => {
-    const currentStepFields = getVisibleFieldsForStep(form, currentStep);
-    const isValid = validateCurrentStepFields(form, currentStepFields);
+  continueBtn?.addEventListener("click", async () => {
+  const currentStepFields = getVisibleFieldsForStep(form, currentStep);
 
-    if (isValid && currentStep < TOTAL_STEPS) {
-      goToStep(currentStep + 1);
-      return;
-    }
+  const isValid = validateCurrentStepFields(form, currentStepFields);
 
-    if (!isValid) {
-      showToast("يرجى إكمال جميع الحقول في هذه الصفحة أولًا", "error");
-    }
-  });
+  if (!isValid) {
+    showToast("يرجى إكمال جميع الحقول في هذه الصفحة أولًا", "error");
+    return;
+  }
 
-  backStepBtn?.addEventListener("click", () => {
-    if (currentStep > 1) {
-      goToStep(currentStep - 1);
+
+  // Check email before moving to step 2
+  if (currentStep === 1) {
+
+    const emailField = form.elements["email"];
+
+    const isEmailAvailable = await validateEmailAvailability(
+      form,
+      emailField
+    );
+
+    if (!isEmailAvailable) {
+      return; // stay in step 1
     }
-  });
+  }
+
+
+  if (currentStep < TOTAL_STEPS) {
+    goToStep(currentStep + 1);
+  }
+});
+
+backStepBtn?.addEventListener("click", () => {
+
+  if (currentStep > 1) {
+    goToStep(currentStep - 1);
+  }
+
+});
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -165,6 +199,13 @@ function initWizard() {
     clearAllFieldErrors(form);
 
     const payload = collectPayload(form);
+    const emailField = form.elements["email"];
+    const isEmailAvailable = await validateEmailAvailability(form, emailField);
+
+    if (!isEmailAvailable) {
+      setLoading(saveBtn, false);
+      return;
+    }
 
     setLoading(saveBtn, true);
 
@@ -256,7 +297,7 @@ function goToStep(step) {
 function getVisibleFieldsForStep(form, step) {
   const fields = [];
   const stepMap = {
-    1: ["arabFullName", "phone", "governorate", "gender", "dob", "idType", "idNumber"],
+    1: ["email", "password", "arabFullName", "phone", "governorate", "gender", "dob", "idType", "idNumber"],
     2: ["englishFullName", "address", "country", "maritalStatus", "religion", "cardIssuePlace", "dataEntryDate", "oneChanceStudent", "studyType", "qualification", "qualificationYear", "schoolName", "total", "seatNumber", "enrollmentStatus", "enrollmentType", "coordinationNumber"],
     3: ["fatherName", "motherName", "fatherJob", "motherJob", "fatherWorkplace", "motherWorkplace", "fatherPhone", "motherPhone", "isFatherDeceased", "guardianName", "guardianRelation", "guardianWorkplace", "guardianPhone", "guardianAddress"],
   };
@@ -284,6 +325,35 @@ function validateCurrentStepFields(form, fields) {
 
     const value = (field.value || "").toString().trim();
     const fieldName = field.name || field.id;
+
+    if (fieldName === "email") {
+      if (!value) {
+        showFieldError(field, "البريد الإلكتروني مطلوب");
+        hasErrors = true;
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+        showFieldError(field, "البريد الإلكتروني غير صحيح");
+        hasErrors = true;
+      } else {
+        clearFieldError(field);
+      }
+      return;
+    }
+
+    if (fieldName === "password") {
+      if (!value) {
+        showFieldError(field, "كلمة المرور مطلوبة");
+        hasErrors = true;
+      } else if (value.length < 8) {
+        showFieldError(field, "كلمة المرور يجب أن تكون 8 أحرف على الأقل");
+        hasErrors = true;
+      } else if (!/^[A-Za-z0-9._-]+$/.test(value)) {
+        showFieldError(field, "A password can only contain letters, numbers, dots, dashes, and underscores");
+        hasErrors = true;
+      } else {
+        clearFieldError(field);
+      }
+      return;
+    }
 
     if (fieldName === "arabFullName") {
       const names = value.split(/\s+/).filter(Boolean);
@@ -400,11 +470,70 @@ function showFieldError(field, message) {
   if (errorEl) errorEl.textContent = message;
 }
 
+async function validateEmailAvailability(form, emailField) {
+  if (!emailField) return true;
+
+  const email = (emailField.value || "").trim().toLowerCase();
+
+  if (!email) {
+    showFieldError(emailField, "البريد الإلكتروني مطلوب");
+    return false;
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showFieldError(emailField, "البريد الإلكتروني غير صحيح");
+    return false;
+  }
+
+  try {
+    const response = await fetch(API_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        validateOnly: true,
+        accountInfo: {
+          email: email,
+        },
+      }),
+    });
+
+    const result = await response.json();
+
+    if (result.available === false) {
+      showFieldError(
+        emailField,
+        result.message || "هذا البريد الإلكتروني مستخدم من قبل"
+      );
+
+      return false;
+    }
+
+
+    clearFieldError(emailField);
+    return true;
+
+
+  } catch (error) {
+    console.error("Email validation error:", error);
+
+    // don't block user if server is temporarily unavailable
+    return true;
+  }
+}
+
 function collectPayload(form) {
   const formData = new FormData(form);
   const data = Object.fromEntries(formData.entries());
 
   return {
+    accountInfo: {
+      email: data.email,
+      password: data.password,
+      status: data.status || "active",
+    },
+
     personalInfo: {
       arabFullName: data.arabFullName,
       englishFullName: data.englishFullName,

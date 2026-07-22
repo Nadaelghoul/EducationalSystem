@@ -1,6 +1,42 @@
 const { body, validationResult } = require("express-validator");
+const Student = require("../models/Student");
 
 const studentValidation = [
+  // Account Information
+
+  body("accountInfo.email")
+    .trim()
+    .notEmpty()
+    .withMessage("البريد الإلكتروني مطلوب")
+    .isEmail()
+    .withMessage("البريد الإلكتروني غير صحيح")
+    .custom(async (value) => {
+      const normalizedEmail = (value || "").toLowerCase().trim();
+      const existingStudent = await Student.findOne({
+        "accountInfo.email": normalizedEmail,
+      }).lean();
+
+      if (existingStudent) {
+        throw new Error("هذا البريد الإلكتروني مستخدم من قبل");
+      }
+
+      return true;
+    }),
+
+  body("accountInfo.password")
+    .trim()
+    .notEmpty()
+    .withMessage("كلمة المرور مطلوبة")
+    .isLength({ min: 8 })
+    .withMessage("كلمة المرور يجب أن تكون 8 أحرف على الأقل")
+    .matches(/^[A-Za-z0-9._-]+$/)
+    .withMessage("A password can only contain letters, numbers, dots, dashes, and underscores"),
+
+  body("accountInfo.status")
+    .optional()
+    .isIn(["active", "inactive"])
+    .withMessage("الحالة غير صحيحة"),
+
   // Personal Information
 
  body("personalInfo.arabFullName")

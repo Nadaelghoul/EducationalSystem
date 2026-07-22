@@ -143,6 +143,41 @@
 
               <div class="form-grid">
                 <div class="field">
+                  <label for="email">البريد الإلكتروني</label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="أدخل البريد الإلكتروني"
+                    autocomplete="email"
+                  />
+                  <span class="field__error" data-error-for="email"></span>
+                </div>
+
+                <div class="field">
+                  <label for="password">كلمة المرور</label>
+                  <div style="position: relative;">
+                    <input
+                      type="password"
+                      id="password"
+                      name="password"
+                      placeholder="أدخل كلمة المرور"
+                      autocomplete="new-password"
+                      style="width: 100%; padding-left: 42px;"
+                    />
+                    <button
+                      type="button"
+                      id="togglePassword"
+                      aria-label="إظهار أو إخفاء كلمة المرور"
+                      style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: #4b5563; cursor: pointer; font-size: 16px;"
+                    >
+                      <i class="fa-solid fa-eye" id="togglePasswordIcon"></i>
+                    </button>
+                  </div>
+                  <span class="field__error" data-error-for="password"></span>
+                </div>
+
+                <div class="field">
                   <label for="arabFullName">اسم الطالب رباعي (عربي)</label>
                   <input
                     type="text"
@@ -865,7 +900,8 @@
         </div>
       </div>
     </div>
-
+    
+    <script src="./config.js"></script>
     <script src="./addStudent.js"></script>
     <script src="./officialForm.js"></script>
   </body>

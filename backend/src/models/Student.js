@@ -36,6 +36,37 @@ const guardianSchema = new mongoose.Schema(
 
 const studentSchema = new mongoose.Schema(
   {
+    accountInfo: {
+      email: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true,
+        lowercase: true,
+        match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      },
+
+      password: {
+        type: String,
+        required: true,
+        trim: true,
+        minlength: 6,
+      },
+
+      universityId: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true,
+      },
+
+      status: {
+        type: String,
+        enum: ["active", "inactive"],
+        default: "active",
+      },
+    },
+
     personalInfo: {
       arabFullName: {
         type: String,
@@ -43,12 +74,22 @@ const studentSchema = new mongoose.Schema(
         trim: true,
         maxlength: 100,
       },
+      arabFullNameNormalized: {
+      type: String,
+       trim: true,
+      lowercase: true,
+     },
 
       englishFullName: {
         type: String,
         required: true,
         trim: true,
         maxlength: 100,
+      },
+
+      photo: {
+      type: String,
+      default: ""
       },
 
       phone: {
@@ -126,6 +167,18 @@ const studentSchema = new mongoose.Schema(
     },
 
     academicInfo: {
+      level: {
+        type: String,
+        enum: ["الأول", "الثاني", "الثالث", "الرابع", "الخامس"],
+        default: "الأول",
+      },
+
+      department: {
+        type: String,
+        enum: ["علوم الحاسب", "نظم المعلومات", "هندسة البرمجيات", "تكنولوجيا المعلومات"],
+        default: "علوم الحاسب",
+      },
+
       oneChanceStudent: {
         type: String,
         required: true,
