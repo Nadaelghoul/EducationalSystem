@@ -37,6 +37,12 @@ if(process.env.NODE_ENV !== "production"){
 })
 }
 
+app.get("/", (req, res) => {
+  res.json({
+    message: "Education System API is running"
+  });
+});
+
 module.exports = app;
 
 
