@@ -455,22 +455,6 @@ student.academicInfo.level
   </button>
 </td>
 
-<td>
-
-<div class="row-actions">
-
-<button 
-class="icon-btn icon-btn--view"
-data-view-id="${student._id}"
-title="عرض الملف الشخصي">
-
-<i class="fa-solid fa-eye"></i>
-
-</button>
-
-</div>
-
-</td>
 
 `;
 

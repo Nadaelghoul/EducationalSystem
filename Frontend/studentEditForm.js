@@ -706,16 +706,22 @@ function initFormSubmit() {
     saveBtn.disabled = true;
     saveBtn.innerHTML =
       '<i class="fa-solid fa-spinner fa-spin"></i> جاري الحفظ...';
+            try {
+  await saveStudentChanges(state.studentId, payload);
 
-    try {
-      await saveStudentChanges(state.studentId, payload);
-      showToast("تم حفظ التعديلات بنجاح", "success");
-    } catch (err) {
-      showToast(err.message || "تعذر حفظ التعديلات", "error");
-    } finally {
-      saveBtn.disabled = false;
-      saveBtn.innerHTML = originalHtml;
-    }
+  showToast("تم حفظ التعديلات بنجاح", "success");
+
+  setTimeout(() => {
+    window.location.href =
+      `${PROFILE_URL_BASE}?id=${state.studentId}`;
+  }, 1000);
+
+} catch (err) {
+  showToast(err.message || "تعذر حفظ التعديلات", "error");
+} finally {
+  saveBtn.disabled = false;
+  saveBtn.innerHTML = originalHtml;
+}
   });
 }
 
