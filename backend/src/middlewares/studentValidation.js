@@ -2,40 +2,6 @@ const { body, validationResult } = require("express-validator");
 const Student = require("../models/Student");
 
 const studentValidation = [
-  // Account Information
-
-  body("accountInfo.email")
-    .trim()
-    .notEmpty()
-    .withMessage("البريد الإلكتروني مطلوب")
-    .isEmail()
-    .withMessage("البريد الإلكتروني غير صحيح")
-    .custom(async (value) => {
-      const normalizedEmail = (value || "").toLowerCase().trim();
-      const existingStudent = await Student.findOne({
-        "accountInfo.email": normalizedEmail,
-      }).lean();
-
-      if (existingStudent) {
-        throw new Error("هذا البريد الإلكتروني مستخدم من قبل");
-      }
-
-      return true;
-    }),
-
-  body("accountInfo.password")
-    .trim()
-    .notEmpty()
-    .withMessage("كلمة المرور مطلوبة")
-    .isLength({ min: 8 })
-    .withMessage("كلمة المرور يجب أن تكون 8 أحرف على الأقل")
-    .matches(/^[A-Za-z0-9._-]+$/)
-    .withMessage("A password can only contain letters, numbers, dots, dashes, and underscores"),
-
-  body("accountInfo.status")
-    .optional()
-    .isIn(["active", "inactive"])
-    .withMessage("الحالة غير صحيحة"),
 
   // Personal Information
 
@@ -62,11 +28,9 @@ const studentValidation = [
     return true;
   }),
 
-
 body("personalInfo.englishFullName")
+  .optional({ checkFalsy: true })
   .trim()
-  .notEmpty()
-  .withMessage("الاسم الإنجليزي مطلوب")
   .custom((value) => {
     const names = value.trim().split(/\s+/);
 
@@ -74,7 +38,7 @@ body("personalInfo.englishFullName")
       throw new Error("الاسم الإنجليزي يجب أن يكون رباعي");
     }
 
-    // English letters only + first letter capital
+    // English letters only + each part starts with a capital letter
     const isValidFormat = names.every((name) =>
       /^[A-Z][a-z]+$/.test(name)
     );
@@ -88,13 +52,22 @@ body("personalInfo.englishFullName")
     return true;
   }),
 
-  body("personalInfo.phone")
-    .matches(/^01[0125][0-9]{8}$/)
-    .withMessage("رقم الهاتف غير صحيح"),
+ body("personalInfo.phone")
+  .notEmpty()
+  .withMessage("رقم الهاتف مطلوب")
+  .matches(/^01[0125][0-9]{8}$/)
+  .withMessage("رقم الهاتف غير صحيح"),
 
-  body("personalInfo.governorate")
-    .notEmpty()
-    .withMessage("المحافظة مطلوبة"),
+ body("personalInfo.governorate")
+.notEmpty()
+.withMessage("المحافظة مطلوبة")
+.isIn([
+ "دمياط",
+ "بورسعيد",
+ "المنصورة",
+ "أخرى"
+])
+.withMessage("المحافظة غير صحيحة"),
 
   body("personalInfo.gender")
     .isIn(["male", "female"])
@@ -107,11 +80,17 @@ body("personalInfo.englishFullName")
     .withMessage("صيغة التاريخ غير صحيحة"),
 
   body("personalInfo.idType")
-    .isIn(["national", "passport"])
-    .withMessage("نوع الهوية غير صحيح"),
+ .notEmpty()
+ .withMessage("نوع الهوية مطلوب")
+ .isIn(["national","passport"])
+ .withMessage("نوع الهوية غير صحيح"),
 
   body("personalInfo.idNumber")
+  .notEmpty()
+  .withMessage("رقم الهوية مطلوب")
+
   .custom(async (value, { req }) => {
+
     const type = req.body.personalInfo.idType;
 
     if (type === "national") {
@@ -126,184 +105,105 @@ body("personalInfo.englishFullName")
       }
     }
 
+    const student = await Student.findOne({
+      "personalInfo.idNumber": value,
+    });
+
+    if (student) {
+      throw new Error("رقم الهوية مستخدم بالفعل");
+    }
+
     return true;
   }),
 
-  body("personalInfo.address")
-    .trim()
-    .isLength({ min: 5 })
-    .withMessage("العنوان غير صحيح"),
-
-  body("personalInfo.country")
-    .trim()
-    .notEmpty()
-    .withMessage("الدولة مطلوبة"),
-
-  body("personalInfo.maritalStatus")
-    .isIn(["single", "married"])
-    .withMessage("الحالة الاجتماعية غير صحيحة"),
+ 
+ body("personalInfo.maritalStatus")
+  .optional({ checkFalsy: true })
+  .isIn(["single", "married"])
+  .withMessage("الحالة الاجتماعية غير صحيحة"),
 
   body("personalInfo.religion")
+    .optional({ checkFalsy: true })
     .isIn(["muslim", "christian", "other"])
     .withMessage("الديانة غير صحيحة"),
 
-  body("personalInfo.cardIssuePlace")
-    .trim()
-    .notEmpty()
-    .withMessage("جهة صدور البطاقة مطلوبة"),
-
   body("personalInfo.dataEntryDate")
-    .isISO8601()
-    .withMessage("تاريخ الإدخال غير صحيح"),
+  .optional({ checkFalsy: true })
+  .isISO8601()
+  .withMessage("تاريخ الإدخال غير صحيح"),
 
   // Academic Information
 
   body("academicInfo.oneChanceStudent")
+    .optional({ checkFalsy: true })
     .isIn(["yes", "no"])
     .withMessage("قيمه غير صحيحه"),
 
   body("academicInfo.studyType")
+    .optional({ checkFalsy: true })
     .isIn(["semesters", "hours"])
     .withMessage("قيمه غير صحيحه"),
 
   body("academicInfo.enrollmentStatus")
+    .optional({ checkFalsy: true })
     .isIn(["new", "transferred", "repeated"])
     .withMessage("قيمه غير صحيحه"),
 
   body("academicInfo.enrollmentType")
+    .optional({ checkFalsy: true })
     .isIn(["general", "transferred_from_other", "reserved"])
     .withMessage("قيمه غير صحيحه"),
 
-  body("academicInfo.coordinationNumber")
-    .trim()
-    .notEmpty()
-    .withMessage("رقم كشف التنيسق مطلوب"),
 
   // Qualification
 
   body("qualification.qualification")
+    .optional({ checkFalsy: true })
     .isIn(["high_school", "diploma", "other"])
     .withMessage("المؤهل غير صحيح"),
 
-  body("qualification.qualificationYear")
-    .isInt({
-      min: 1970,
-      max: 2100,
-    })
-    .withMessage("سنة الحصول علي المؤهل غير صحيحه"),
+ body("qualification.qualificationYear")
+  .optional({ checkFalsy: true })
+  .isInt({
+    min: 1970,
+    max: 2100,
+  })
+  .withMessage("سنة الحصول علي المؤهل غير صحيحه"),
 
-  body("qualification.schoolName")
-    .trim()
-    .notEmpty()
-    .withMessage("اسم المدرسة مطلوب"),
 
-  body("qualification.total")
-    .isFloat({
-      min: 0,
-    })
-    .withMessage("المجموع غير صحيح"),
-
-  body("qualification.seatNumber")
-    .trim()
-    .notEmpty()
-    .withMessage("رقم الجلوس مطلوب"),
+   body("qualification.total")
+  .optional({ checkFalsy: true })
+  .isFloat({ min: 0 })
+  .withMessage("المجموع غير صحيح"),
 
   // Family Information
 
-  body("familyInfo.fatherName")
-    .trim()
-    .notEmpty()
-    .withMessage("اسم الاب مطلوب"),
-
-  body("familyInfo.motherName")
-    .trim()
-    .notEmpty()
-    .withMessage("اسم الام مطلوب"),
-
-  body("familyInfo.fatherJob")
-    .trim()
-    .notEmpty()
-    .withMessage("مهنة الاب مطلوبة"),
-
-  body("familyInfo.motherJob")
-    .trim()
-    .notEmpty()
-    .withMessage("مهنة الام مطلوبة"),
-
-  body("familyInfo.fatherWorkplace")
-    .trim()
-    .notEmpty()
-    .withMessage("جهة عمل الاب مطلوبة"),
-
-  body("familyInfo.motherWorkplace")
-    .trim()
-    .notEmpty()
-    .withMessage("جهة عمل الام مطلوبة"),
-
   body("familyInfo.fatherPhone")
-    .matches(/^01[0125][0-9]{8}$/)
-    .withMessage("هاتف الاب غير صحيح"),
+  .optional({ checkFalsy: true })
+  .matches(/^01[0125][0-9]{8}$/)
+  .withMessage("هاتف الاب غير صحيح"),
 
   body("familyInfo.motherPhone")
-    .matches(/^01[0125][0-9]{8}$/)
-    .withMessage("هاتف الام غير صحيح"),
-
+  .optional({ checkFalsy: true })
+  .matches(/^01[0125][0-9]{8}$/)
+  .withMessage("هاتف الام غير صحيح"),
   // Guardian Information
 
-  body("familyInfo.guardian.guardianName")
-    .custom((value, { req }) => {
-      if (
-        req.body.familyInfo.isFatherDeceased &&
-        (!value || value.trim() === "")
-      ) {
-        throw new Error("اسم ولي الامر مطلوب");
-      }
-      return true;
-    }),
+   body("familyInfo.guardian.guardianPhone")
+  .optional()
+  .trim()
+  .custom((value) => {
 
-  body("familyInfo.guardian.guardianRelation")
-    .custom((value, { req }) => {
-      if (
-        req.body.familyInfo.isFatherDeceased &&
-        (!value || value.trim() === "")
-      ) {
-        throw new Error("درجة القرابة لولي الامر مطلوبة");
-      }
-      return true;
-    }),
+    if (!value) return true;
 
-  body("familyInfo.guardian.guardianWorkplace")
-    .custom((value, { req }) => {
-      if (
-        req.body.familyInfo.isFatherDeceased &&
-        (!value || value.trim() === "")
-      ) {
-        throw new Error("جهة عمل ولي الامر مطلوبة");
-      }
-      return true;
-    }),
+    if (!/^01[0125][0-9]{8}$/.test(value)) {
+      throw new Error("هاتف ولي الأمر غير صحيح");
+    }
 
-  body("familyInfo.guardian.guardianPhone")
-    .custom((value, { req }) => {
-      if (!req.body.familyInfo.isFatherDeceased) return true;
+    return true;
 
-      if (!/^01[0125][0-9]{8}$/.test(value)) {
-        throw new Error("هاتف ولي الامر غير صحيح");
-      }
-
-      return true;
-    }),
-
-  body("familyInfo.guardian.guardianAddress")
-    .custom((value, { req }) => {
-      if (
-        req.body.familyInfo.isFatherDeceased &&
-        (!value || value.trim() === "")
-      ) {
-        throw new Error("عنوان ولي الامر مطلوب");
-      }
-      return true;
-    }),
+  }),
+ 
 ];
 
 const validateStudent = (req, res, next) => {

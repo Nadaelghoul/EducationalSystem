@@ -36,36 +36,33 @@ const guardianSchema = new mongoose.Schema(
 
 const studentSchema = new mongoose.Schema(
   {
-    accountInfo: {
-      email: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true,
-        lowercase: true,
-        match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-      },
+   accountInfo: {
+  username: {
+    type: String,
+    unique: true,
+    trim: true,
+    default: ""
+  },
 
-      password: {
-        type: String,
-        required: true,
-        trim: true,
-        minlength: 6,
-      },
+  password: {
+    type: String,
+    trim: true,
+    default: ""
+  },
 
-      universityId: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true,
-      },
+  universityId: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+  },
 
-      status: {
-        type: String,
-        enum: ["active", "inactive"],
-        default: "active",
-      },
-    },
+  status: {
+    type: String,
+    enum: ["active", "inactive"],
+    default: "active",
+  },
+},
 
     personalInfo: {
       arabFullName: {
@@ -82,9 +79,9 @@ const studentSchema = new mongoose.Schema(
 
       englishFullName: {
         type: String,
-        required: true,
         trim: true,
         maxlength: 100,
+          default: "",
       },
 
       photo: {
@@ -124,45 +121,45 @@ const studentSchema = new mongoose.Schema(
       idNumber: {
         type: String,
         required: true,
+        unique: true,
         trim: true,
       },
 
       address: {
         type: String,
-        required: true,
         trim: true,
         maxlength: 250,
+        default: "",
       },
 
       country: {
         type: String,
-        required: true,
         trim: true,
         default: "مصر",
       },
 
       maritalStatus: {
         type: String,
-        required: true,
         enum: ["single", "married"],
+        default:null,
       },
 
       religion: {
         type: String,
-        required: true,
         enum: ["muslim", "christian", "other"],
+        default:null,
       },
 
       cardIssuePlace: {
         type: String,
-        required: true,
         trim: true,
         maxlength: 100,
+        default: "",
       },
 
       dataEntryDate: {
         type: Date,
-        required: true,
+         default: null,
       },
     },
 
@@ -176,129 +173,129 @@ const studentSchema = new mongoose.Schema(
       department: {
         type: String,
         enum: ["علوم الحاسب", "نظم المعلومات", "هندسة البرمجيات", "تكنولوجيا المعلومات"],
-        default: "علوم الحاسب",
+        default:null,
       },
 
       oneChanceStudent: {
         type: String,
-        required: true,
         enum: ["yes", "no"],
+        default:null,
       },
 
       studyType: {
         type: String,
-        required: true,
         enum: ["semesters", "hours"],
+         default:null
       },
 
       enrollmentStatus: {
         type: String,
-        required: true,
         enum: ["new", "transferred", "repeated"],
+         default:null
       },
 
       enrollmentType: {
         type: String,
-        required: true,
         enum: ["general", "transferred_from_other", "reserved"],
+        default:null
       },
 
       coordinationNumber: {
         type: String,
-        required: true,
         trim: true,
         maxlength: 50,
+        default:"",
       },
     },
 
     qualification: {
       qualification: {
         type: String,
-        required: true,
         enum: ["high_school", "diploma", "other"],
+        default:null
       },
 
       qualificationYear: {
         type: Number,
-        required: true,
         min: 1970,
         max: 2100,
+        default: null,
       },
 
       schoolName: {
         type: String,
-        required: true,
         trim: true,
         maxlength: 150,
+        default:"",
       },
 
       total: {
         type: Number,
-        required: true,
         min: 0,
+        default: null,
       },
 
       seatNumber: {
         type: String,
-        required: true,
         trim: true,
         maxlength: 30,
+        default:"",
       },
     },
 
     familyInfo: {
       fatherName: {
         type: String,
-        required: true,
         trim: true,
         maxlength: 100,
+         default:"",
       },
 
       motherName: {
         type: String,
-        required: true,
         trim: true,
         maxlength: 100,
+         default:"",
       },
 
       fatherJob: {
         type: String,
-        required: true,
         trim: true,
         maxlength: 100,
+         default:"",
       },
 
       motherJob: {
         type: String,
-        required: true,
         trim: true,
         maxlength: 100,
+         default:"",
       },
 
       fatherWorkplace: {
         type: String,
-        required: true,
         trim: true,
         maxlength: 150,
+         default:"",
       },
 
       motherWorkplace: {
         type: String,
-        required: true,
         trim: true,
         maxlength: 150,
+         default:"",
       },
 
       fatherPhone: {
         type: String,
-        required: true,
         match: /^01[0125][0-9]{8}$/,
+         default:"",
       },
 
       motherPhone: {
         type: String,
-        required: true,
         match: /^01[0125][0-9]{8}$/,
+         default:"",
       },
 
       isFatherDeceased: {

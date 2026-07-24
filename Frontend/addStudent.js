@@ -8,23 +8,8 @@ document.addEventListener("DOMContentLoaded", () => {
   initSidebarToggle();
   initThemeToggle();
   initConditionalFields();
-  initPasswordToggle();
   initWizard();
 });
-
-function initPasswordToggle() {
-  const passwordInput = document.getElementById("password");
-  const toggleButton = document.getElementById("togglePassword");
-  const toggleIcon = document.getElementById("togglePasswordIcon");
-
-  if (!passwordInput || !toggleButton || !toggleIcon) return;
-
-  toggleButton.addEventListener("click", () => {
-    const isHidden = passwordInput.type === "password";
-    passwordInput.type = isHidden ? "text" : "password";
-    toggleIcon.className = isHidden ? "fa-solid fa-eye-slash" : "fa-solid fa-eye";
-  });
-}
 
 function initThemeToggle() {
   const toggleBtn = document.getElementById("themeToggleBtn");
@@ -163,21 +148,21 @@ function initWizard() {
     return;
   }
 
+  // Check idNumber before moving to step 2
+if (currentStep === 1) {
 
-  // Check email before moving to step 2
-  if (currentStep === 1) {
+  const idField = form.elements["idNumber"];
 
-    const emailField = form.elements["email"];
-
-    const isEmailAvailable = await validateEmailAvailability(
+  const isIdAvailable =
+    await validateIdNumberAvailability(
       form,
-      emailField
+      idField
     );
 
-    if (!isEmailAvailable) {
-      return; // stay in step 1
-    }
+  if (!isIdAvailable) {
+    return;
   }
+}
 
 
   if (currentStep < TOTAL_STEPS) {
@@ -199,13 +184,6 @@ backStepBtn?.addEventListener("click", () => {
     clearAllFieldErrors(form);
 
     const payload = collectPayload(form);
-    const emailField = form.elements["email"];
-    const isEmailAvailable = await validateEmailAvailability(form, emailField);
-
-    if (!isEmailAvailable) {
-      setLoading(saveBtn, false);
-      return;
-    }
 
     setLoading(saveBtn, true);
 
@@ -297,7 +275,7 @@ function goToStep(step) {
 function getVisibleFieldsForStep(form, step) {
   const fields = [];
   const stepMap = {
-    1: ["email", "password", "arabFullName", "phone", "governorate", "gender", "dob", "idType", "idNumber"],
+    1: [ "arabFullName", "phone", "governorate", "gender", "dob", "idType", "idNumber"],
     2: ["englishFullName", "address", "country", "maritalStatus", "religion", "cardIssuePlace", "dataEntryDate", "oneChanceStudent", "studyType", "qualification", "qualificationYear", "schoolName", "total", "seatNumber", "enrollmentStatus", "enrollmentType", "coordinationNumber"],
     3: ["fatherName", "motherName", "fatherJob", "motherJob", "fatherWorkplace", "motherWorkplace", "fatherPhone", "motherPhone", "isFatherDeceased", "guardianName", "guardianRelation", "guardianWorkplace", "guardianPhone", "guardianAddress"],
   };
@@ -326,35 +304,6 @@ function validateCurrentStepFields(form, fields) {
     const value = (field.value || "").toString().trim();
     const fieldName = field.name || field.id;
 
-    if (fieldName === "email") {
-      if (!value) {
-        showFieldError(field, "البريد الإلكتروني مطلوب");
-        hasErrors = true;
-      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-        showFieldError(field, "البريد الإلكتروني غير صحيح");
-        hasErrors = true;
-      } else {
-        clearFieldError(field);
-      }
-      return;
-    }
-
-    if (fieldName === "password") {
-      if (!value) {
-        showFieldError(field, "كلمة المرور مطلوبة");
-        hasErrors = true;
-      } else if (value.length < 8) {
-        showFieldError(field, "كلمة المرور يجب أن تكون 8 أحرف على الأقل");
-        hasErrors = true;
-      } else if (!/^[A-Za-z0-9._-]+$/.test(value)) {
-        showFieldError(field, "A password can only contain letters, numbers, dots, dashes, and underscores");
-        hasErrors = true;
-      } else {
-        clearFieldError(field);
-      }
-      return;
-    }
-
     if (fieldName === "arabFullName") {
       const names = value.split(/\s+/).filter(Boolean);
       if (!value) {
@@ -373,27 +322,64 @@ function validateCurrentStepFields(form, fields) {
     }
 
     if (fieldName === "englishFullName") {
-      const names = value.split(/\s+/).filter(Boolean);
-      if (!value) {
-        showFieldError(field, "الاسم الإنجليزي مطلوب");
-        hasErrors = true;
-      } else if (names.length < 4) {
-        showFieldError(field, "الاسم الإنجليزي يجب أن يكون رباعي");
-        hasErrors = true;
-      } else if (!names.every((name) => /^[A-Z][a-z]+$/.test(name))) {
-        showFieldError(field, "الاسم الإنجليزي يجب أن يكون باللغة الإنجليزية فقط وكل جزء يبدأ بحرف كبير");
-        hasErrors = true;
-      } else {
-        clearFieldError(field);
-      }
-      return;
-    }
+  const names = value.split(/\s+/).filter(Boolean);
 
-    if ((fieldName === "phone" || fieldName === "fatherPhone" || fieldName === "motherPhone") && !/^01[0125][0-9]{8}$/.test(value)) {
-      showFieldError(field, "رقم الهاتف غير صحيح");
-      hasErrors = true;
-      return;
-    }
+  // optional: allow empty value
+  if (!value) {
+    clearFieldError(field);
+    return;
+  }
+
+  // if entered, validate it
+  if (names.length < 4) {
+    showFieldError(field, "الاسم الإنجليزي يجب أن يكون رباعي");
+    hasErrors = true;
+  } 
+  else if (!names.every((name) => /^[A-Z][a-z]+$/.test(name))) {
+    showFieldError(
+      field,
+      "الاسم الإنجليزي يجب أن يكون باللغة الإنجليزية فقط وكل جزء يبدأ بحرف كبير"
+    );
+    hasErrors = true;
+  } 
+  else {
+    clearFieldError(field);
+  }
+
+  return;
+}
+
+  // Student phone (required)
+if (fieldName === "phone") {
+
+  if (!value) {
+    showFieldError(field, "رقم الهاتف مطلوب");
+    hasErrors = true;
+    return;
+  }
+
+  if (!/^01[0125][0-9]{8}$/.test(value)) {
+    showFieldError(field, "رقم الهاتف غير صحيح");
+    hasErrors = true;
+    return;
+  }
+
+  clearFieldError(field);
+  return;
+}
+
+// Father & Mother phones (optional)
+if (fieldName === "fatherPhone" || fieldName === "motherPhone") {
+
+  if (value && !/^01[0125][0-9]{8}$/.test(value)) {
+    showFieldError(field, "رقم الهاتف غير صحيح");
+    hasErrors = true;
+    return;
+  }
+
+  clearFieldError(field);
+  return;
+}
 
     if (fieldName === "idNumber") {
       const idType = form.elements["idType"]?.value;
@@ -421,41 +407,43 @@ function validateCurrentStepFields(form, fields) {
       return;
     }
 
-    if ((fieldName === "governorate" || fieldName === "gender" || fieldName === "dob" || fieldName === "idType" || fieldName === "address" || fieldName === "country" || fieldName === "maritalStatus" || fieldName === "religion" || fieldName === "cardIssuePlace" || fieldName === "dataEntryDate" || fieldName === "oneChanceStudent" || fieldName === "studyType" || fieldName === "qualification" || fieldName === "qualificationYear" || fieldName === "schoolName" || fieldName === "total" || fieldName === "seatNumber" || fieldName === "enrollmentStatus" || fieldName === "enrollmentType" || fieldName === "coordinationNumber" || fieldName === "fatherName" || fieldName === "motherName" || fieldName === "fatherJob" || fieldName === "motherJob" || fieldName === "fatherWorkplace" || fieldName === "motherWorkplace" || fieldName === "fatherPhone" || fieldName === "motherPhone") && !value) {
+    if ((fieldName === "governorate" || fieldName === "gender" || fieldName === "dob" || fieldName === "idType") && !value) {
       showFieldError(field, "هذا الحقل مطلوب");
       hasErrors = true;
       return;
     }
 
-    if (fieldName === "guardianName" && form.elements["isFatherDeceased"]?.checked && !value) {
-      showFieldError(field, "اسم ولي الأمر مطلوب");
-      hasErrors = true;
-      return;
-    }
+   if (fieldName === "guardianName") {
+    clearFieldError(field);
+    return;
+  }
 
-    if (fieldName === "guardianRelation" && form.elements["isFatherDeceased"]?.checked && !value) {
-      showFieldError(field, "درجة القرابة مطلوبة");
-      hasErrors = true;
-      return;
-    }
+    if (fieldName === "guardianRelation") {
+  clearFieldError(field);
+  return;
+}
 
-    if (fieldName === "guardianWorkplace" && form.elements["isFatherDeceased"]?.checked && !value) {
-      showFieldError(field, "جهة عمل ولي الأمر مطلوبة");
-      hasErrors = true;
-      return;
-    }
+   if (fieldName === "guardianWorkplace") {
+  clearFieldError(field);
+  return;
+}
 
-    if (fieldName === "guardianPhone" && form.elements["isFatherDeceased"]?.checked && !/^01[0125][0-9]{8}$/.test(value)) {
-      showFieldError(field, "هاتف ولي الأمر غير صحيح");
-      hasErrors = true;
-      return;
-    }
+    if (fieldName === "guardianPhone") {
 
-    if (fieldName === "guardianAddress" && form.elements["isFatherDeceased"]?.checked && !value) {
-      showFieldError(field, "عنوان ولي الأمر مطلوب");
-      hasErrors = true;
-      return;
-    }
+  if (value && !/^01[0125][0-9]{8}$/.test(value)) {
+    showFieldError(field, "هاتف ولي الأمر غير صحيح");
+    hasErrors = true;
+    return;
+  }
+
+  clearFieldError(field);
+  return;
+}
+
+ if (fieldName === "guardianAddress") {
+  clearFieldError(field);
+  return;
+}
 
     clearFieldError(field);
   });
@@ -470,57 +458,60 @@ function showFieldError(field, message) {
   if (errorEl) errorEl.textContent = message;
 }
 
-async function validateEmailAvailability(form, emailField) {
-  if (!emailField) return true;
+async function validateIdNumberAvailability(form, idField) {
 
-  const email = (emailField.value || "").trim().toLowerCase();
+  if (!idField) return true;
 
-  if (!email) {
-    showFieldError(emailField, "البريد الإلكتروني مطلوب");
+
+  const idNumber = idField.value.trim();
+
+
+  if (!idNumber) {
+    showFieldError(
+      idField,
+      "الرقم القومي مطلوب"
+    );
     return false;
   }
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    showFieldError(emailField, "البريد الإلكتروني غير صحيح");
-    return false;
-  }
 
   try {
-    const response = await fetch(API_ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        validateOnly: true,
-        accountInfo: {
-          email: email,
-        },
-      }),
-    });
+
+    const response = await fetch(
+      `${API_ENDPOINT}/check-id/${idNumber}`
+    );
+
 
     const result = await response.json();
 
+
     if (result.available === false) {
+
       showFieldError(
-        emailField,
-        result.message || "هذا البريد الإلكتروني مستخدم من قبل"
+        idField,
+        result.message || "رقم الهوية مستخدم بالفعل"
       );
 
       return false;
     }
 
 
-    clearFieldError(emailField);
+    clearFieldError(idField);
+
     return true;
 
 
-  } catch (error) {
-    console.error("Email validation error:", error);
+  } catch(error){
 
-    // don't block user if server is temporarily unavailable
+    console.error(
+      "ID validation error:",
+      error
+    );
+
     return true;
+
   }
+
 }
 
 function collectPayload(form) {
@@ -529,7 +520,7 @@ function collectPayload(form) {
 
   return {
     accountInfo: {
-      email: data.email,
+      Username: data.username,
       password: data.password,
       status: data.status || "active",
     },
@@ -548,7 +539,7 @@ function collectPayload(form) {
       maritalStatus: data.maritalStatus,
       religion: data.religion,
       cardIssuePlace: data.cardIssuePlace,
-      dataEntryDate: data.dataEntryDate,
+      dataEntryDate:data.dataEntryDate || null,
     },
 
     academicInfo: {
@@ -561,9 +552,9 @@ function collectPayload(form) {
 
     qualification: {
       qualification: data.qualification,
-      qualificationYear: Number(data.qualificationYear),
+      qualificationYear: data.qualificationYear? Number(data.qualificationYear): null,
       schoolName: data.schoolName,
-      total: Number(data.total),
+      total:data.total? Number(data.total): null,
       seatNumber: data.seatNumber,
     },
 
@@ -574,8 +565,8 @@ function collectPayload(form) {
       motherJob: data.motherJob,
       fatherWorkplace: data.fatherWorkplace,
       motherWorkplace: data.motherWorkplace,
-      fatherPhone: data.fatherPhone,
-      motherPhone: data.motherPhone,
+      fatherPhone:data.fatherPhone || "",
+      motherPhone:data.motherPhone || "",
       isFatherDeceased: form.elements["isFatherDeceased"].checked,
 
       guardian: {

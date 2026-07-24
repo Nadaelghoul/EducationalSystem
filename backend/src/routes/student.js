@@ -85,45 +85,7 @@ const upload = multer({
 
 
 
-router.post( "/", async (req, res, next) => {
-    if (req.body?.validateOnly !== true) {
-      return next();
-    }
-
-    const email = req.body?.accountInfo?.email?.toString().trim().toLowerCase();
-
-    if (!email) {
-      return res.status(400).json({
-        success: false,
-        available: false,
-        message: "البريد الإلكتروني مطلوب",
-      });
-    }
-
-    try {
-      const existingStudent = await Student.findOne({
-        "accountInfo.email": email,
-      }).lean();
-
-      return res.json({
-        success: true,
-        available: !existingStudent,
-        message: existingStudent
-          ? "هذا البريد الإلكتروني مستخدم من قبل"
-          : "البريد الإلكتروني متاح",
-      });
-    } catch (error) {
-      console.error("Validate email error:", error);
-      return res.status(500).json({
-        success: false,
-        available: false,
-        message: "Failed to validate email.",
-      });
-    }
-  },
-  studentValidation,
-  validateStudent,
-  async (req, res) => {
+router.post( "/", studentValidation, validateStudent,async (req, res) => {
   try {
     const payload = { ...req.body };
 
@@ -159,22 +121,35 @@ const universityId =
 
 
 payload.accountInfo = {
-  ...(payload.accountInfo || {}),
   universityId,
+  username: universityId,
+  password: payload.personalInfo.idNumber,
   status: "active",
 };
 
     payload.academicInfo = {
       ...(payload.academicInfo || {}),
       level: "الأول",
-      department: "علوم الحاسب",
+      department: "",
     };
+
+    const existingStudent = await Student.findOne({
+  "personalInfo.idNumber":
+    payload.personalInfo.idNumber,
+});
+
+if (existingStudent) {
+  return res.status(400).json({
+    success: false,
+    message: "رقم الهوية مستخدم بالفعل",
+  });
+}
 
     const student = new Student(payload);
     const savedStudent = await student.save();
 
     const officialPayload = {
-      email: savedStudent.accountInfo?.email || "",
+     username:savedStudent.accountInfo?.username || "",
       universityId: savedStudent.accountInfo?.universityId || "",
       status: savedStudent.accountInfo?.status || "active",
       arabFullName: savedStudent.personalInfo?.arabFullName || "",
@@ -301,6 +276,34 @@ router.get("/", async (req, res) => {
   } catch(error){
 
     res.status(500).json({
+      message:error.message
+    });
+
+  }
+});
+
+router.get("/check-id/:idNumber", async (req, res) => {
+  try {
+
+    const student = await Student.findOne({
+      "personalInfo.idNumber": req.params.idNumber
+    });
+
+    if (student) {
+      return res.json({
+        available: false,
+        message: "رقم الهوية مستخدم بالفعل"
+      });
+    }
+
+    res.json({
+      available: true
+    });
+
+  } catch(error){
+
+    res.status(500).json({
+      success:false,
       message:error.message
     });
 
