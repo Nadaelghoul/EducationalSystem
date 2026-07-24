@@ -9,7 +9,16 @@ document.addEventListener("DOMContentLoaded", () => {
   initThemeToggle();
   initConditionalFields();
   initWizard();
+  initBackButton(); 
 });
+
+function initBackButton() {
+  const backBtn = document.getElementById("backBtn");
+
+  backBtn?.addEventListener("click", () => {
+    window.location.href = "./index.html";
+  });
+}
 
 function initThemeToggle() {
   const toggleBtn = document.getElementById("themeToggleBtn");
