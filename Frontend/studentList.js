@@ -123,9 +123,13 @@ function initNavButtons(){
 
 async function loadStudents(){
 
+  showLoading();
+
   try{
 
-    state.filtered = await fetchStudents();
+    state.filtered = await withMinDelay(
+      fetchStudents()
+    );
 
     renderTable();
     renderPagination();
@@ -137,7 +141,70 @@ async function loadStudents(){
       "error"
     );
 
+  }finally{
+
+    hideLoading();
+
   }
+
+}
+
+
+// =========================
+// LOADING STATE
+// =========================
+
+
+const MIN_LOADING_MS = 500;
+
+
+function showLoading(){
+
+  const loadingEl =
+    document.getElementById("loadingStudents");
+
+  const emptyEl =
+    document.getElementById("tableEmpty");
+
+  const tableEl =
+    document.getElementById("studentsTable");
+
+  if(emptyEl) emptyEl.hidden = true;
+
+  if(tableEl) tableEl.hidden = true;
+
+  if(loadingEl) loadingEl.hidden = false;
+
+}
+
+
+function hideLoading(){
+
+  const loadingEl =
+    document.getElementById("loadingStudents");
+
+  const tableEl =
+    document.getElementById("studentsTable");
+
+  if(loadingEl) loadingEl.hidden = true;
+
+  if(tableEl) tableEl.hidden = false;
+
+}
+
+
+// Ensures the spinner stays visible for at least
+// MIN_LOADING_MS, even if the request resolves faster,
+// so it doesn't flicker on/off instantly.
+function withMinDelay(promise, ms = MIN_LOADING_MS){
+
+  const delay =
+    new Promise(resolve =>
+      setTimeout(resolve, ms)
+    );
+
+  return Promise.all([promise, delay])
+    .then(([result]) => result);
 
 }
 
@@ -275,16 +342,21 @@ document.getElementById("filterStatus")
 
 
 
+showLoading();
+
+
 try{
 
 
 state.filtered =
-await fetchStudents({
+await withMinDelay(
+fetchStudents({
 search,
 department,
 level,
 status
-});
+})
+);
 
 
 
@@ -299,6 +371,10 @@ showToast(
 "حدث خطأ أثناء البحث",
 "error"
 );
+
+}finally{
+
+hideLoading();
 
 }
 
