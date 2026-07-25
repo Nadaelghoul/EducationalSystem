@@ -46,12 +46,12 @@ const FIELD_DEFS = [
     editable: false,
   },
   {
-  key: "governorate",
-  label: "المحافظة",
-  section: "personal",
-  type: "text",
-  editable: false,
-},
+    key: "governorate",
+    label: "المحافظة",
+    section: "personal",
+    type: "text",
+    editable: false,
+  },
   {
     key: "address",
     label: "العنوان بالتفصيل",
@@ -69,60 +69,60 @@ const FIELD_DEFS = [
     editable: false,
   },
   {
-  key: "department",
-  label: "القسم",
-  section: "academic",
-  type: "select",
-  editable: true,
-  options: [
-    {
-      value: "علوم الحاسب",
-      label: "علوم الحاسب"
-    },
-    {
-      value: "نظم المعلومات",
-      label: "نظم المعلومات"
-    },
-    {
-      value: "هندسة البرمجيات",
-      label: "هندسة البرمجيات"
-    },
-    {
-      value: "تكنولوجيا المعلومات",
-      label: "تكنولوجيا المعلومات"
-    }
-  ],
-},
+    key: "department",
+    label: "القسم",
+    section: "academic",
+    type: "select",
+    editable: true,
+    options: [
+      {
+        value: "علوم الحاسب",
+        label: "علوم الحاسب",
+      },
+      {
+        value: "نظم المعلومات",
+        label: "نظم المعلومات",
+      },
+      {
+        value: "هندسة البرمجيات",
+        label: "هندسة البرمجيات",
+      },
+      {
+        value: "تكنولوجيا المعلومات",
+        label: "تكنولوجيا المعلومات",
+      },
+    ],
+  },
   {
     key: "level",
     label: "المستوى",
     section: "academic",
     type: "select",
     editable: true,
-   options:[
-{
- value:"الأول",
- label:"الأول"
-},
-{
- value:"الثاني",
- label:"الثاني"
-},
-{
- value:"الثالث",
- label:"الثالث"
-},
-{
- value:"الرابع",
- label:"الرابع"
-},
-{
- value:"الخامس",
- label:"الخامس"
-}
-]
+    options: [
+      {
+        value: "الأول",
+        label: "الأول",
+      },
+      {
+        value: "الثاني",
+        label: "الثاني",
+      },
+      {
+        value: "الثالث",
+        label: "الثالث",
+      },
+      {
+        value: "الرابع",
+        label: "الرابع",
+      },
+      {
+        value: "الخامس",
+        label: "الخامس",
+      },
+    ],
   },
-  
+
   {
     key: "enrollmentDate",
     label: "تاريخ الالتحاق",
@@ -130,7 +130,7 @@ const FIELD_DEFS = [
     type: "date",
     editable: true,
   },
-  
+
   //  بيانات التواصل (محتاجة موافقة الإدارة إلا هاتف ولي الأمر)
   {
     key: "phone",
@@ -147,20 +147,20 @@ const FIELD_DEFS = [
     editable: false,
   },
   {
-  key: "fatherPhone",
-  label: "رقم الأب",
-  section: "contact",
-  type: "tel",
-  editable: true,
-},
+    key: "fatherPhone",
+    label: "رقم الأب",
+    section: "contact",
+    type: "tel",
+    editable: true,
+  },
 
-{
-  key: "guardianPhone",
-  label: "هاتف ولي الأمر (الأب متوفي)",
-  section: "contact",
-  type: "tel",
-  editable: true,
-},
+  {
+    key: "guardianPhone",
+    label: "هاتف ولي الأمر (الأب متوفي)",
+    section: "contact",
+    type: "tel",
+    editable: true,
+  },
 ];
 
 const state = {
@@ -179,77 +179,47 @@ document.addEventListener("DOMContentLoaded", async () => {
   initPhotoChange();
 });
 
-function initPhotoChange(){
-
+function initPhotoChange() {
   const btn = document.getElementById("photoChangeBtn");
   const input = document.getElementById("photoInput");
 
-
-  btn.addEventListener("click",()=>{
-
+  btn.addEventListener("click", () => {
     input.click();
-
   });
 
-
   input.addEventListener("change", uploadStudentPhoto);
-
 }
 
-async function uploadStudentPhoto(e){
-
+async function uploadStudentPhoto(e) {
   const file = e.target.files[0];
 
-  if(!file) return;
-
+  if (!file) return;
 
   const formData = new FormData();
 
   formData.append("photo", file);
 
-
-  try{
-
-
-    const response = await fetch(
-      `${API_BASE}/${state.studentId}/photo`,
-      {
-        method:"PATCH",
-        body:formData
-      }
-    );
-
+  try {
+    const response = await fetch(`${API_BASE}/${state.studentId}/photo`, {
+      method: "PATCH",
+      body: formData,
+    });
 
     const result = await response.json();
 
-
-    if(!response.ok){
+    if (!response.ok) {
       throw new Error(result.message);
     }
 
     document.getElementById("studentPhoto").src =
-       `${result.data.personalInfo.photo}?t=${Date.now()}`;
+      `${result.data.personalInfo.photo}?t=${Date.now()}`;
 
+    state.student.personalInfo.photo = result.data.personalInfo.photo;
 
-    state.student.personalInfo.photo =
-      result.data.personalInfo.photo;
-
-
-    showToast(
-      "تم تغيير الصورة بنجاح",
-      "success"
-    );
-
-
-  }catch(error){
-
-    showToast(
-      error.message || "فشل تغيير الصورة",
-      "error"
-    );
-
+    showToast("تم تغيير الصورة بنجاح", "success");
+  } catch (error) {
+    showToast(error.message || "فشل تغيير الصورة", "error");
   }
-
 }
 
 //  Theme toggle
@@ -307,9 +277,9 @@ async function loadEditForm() {
   }
 
   try {
-   const student = await fetchStudentById(state.studentId);
+    const student = await fetchStudentById(state.studentId);
 
-   const requests = {};
+    const requests = {};
 
     if (!student) {
       showError("لا يوجد طالب بهذا الرقم");
@@ -325,24 +295,17 @@ async function loadEditForm() {
 }
 
 async function fetchStudentById(id) {
+  const response = await fetch(`${API_BASE}/${id}`, {
+    headers: {
+      Accept: "application/json",
+    },
+  });
 
-  const response = await fetch(
-    `${API_BASE}/${id}`,
-    {
-      headers:{
-        Accept:"application/json"
-      }
-    }
-  );
-
-
-  if(!response.ok){
+  if (!response.ok) {
     throw new Error("تعذر تحميل بيانات الطالب");
   }
 
-
   return await response.json();
-
 }
 
 async function fetchEditRequests(studentId) {
@@ -372,24 +335,20 @@ function renderForm() {
   document.getElementById("loadingState").hidden = true;
 
   const student = state.student;
-  
-    document.getElementById("studentPhoto").src =
-     student.personalInfo?.photo
-     ? student.personalInfo.photo
-     : FALLBACK_PHOTO;
 
-     document.getElementById("studentPhoto").onerror = () => {
+  document.getElementById("studentPhoto").src = student.personalInfo?.photo
+    ? student.personalInfo.photo
+    : FALLBACK_PHOTO;
+
+  document.getElementById("studentPhoto").onerror = () => {
     document.getElementById("studentPhoto").src = FALLBACK_PHOTO;
   };
 
-
-document.getElementById("studentName").textContent =
+  document.getElementById("studentName").textContent =
     student.personalInfo?.arabFullName || "—";
 
-
-document.getElementById("studentIdText").textContent =
+  document.getElementById("studentIdText").textContent =
     student.accountInfo?.universityId || "—";
- 
 
   ["personal", "academic", "contact"].forEach((section) => {
     const container = document.getElementById(`section-${section}`);
@@ -399,7 +358,6 @@ document.getElementById("studentIdText").textContent =
     });
   });
 
-  document.getElementById("infoNotice").hidden = false;
   document.getElementById("editForm").hidden = false;
 }
 
@@ -411,6 +369,7 @@ function renderField(def) {
 
   const wrap = document.createElement("div");
   wrap.className = "field";
+  if (!isUnlocked) wrap.classList.add("field--locked");
 
   const label = document.createElement("div");
   label.className = "field__label";
@@ -421,6 +380,14 @@ function renderField(def) {
 
   const row = document.createElement("div");
   row.className = "field__input-row";
+
+  if (!isUnlocked) {
+    const tooltip = document.createElement("div");
+    tooltip.className = "field-tooltip";
+    tooltip.textContent =
+      "هذا الحقل غير قابل للتعديل مباشرة. اضغط على زر الطلب لإرسال طلب تعديل للإدارة، وبمجرد الموافقة هيبقى الحقل قابل للتعديل.";
+    wrap.appendChild(tooltip);
+  }
 
   const input = buildInputElement(def, isUnlocked);
   row.appendChild(input);
@@ -468,137 +435,103 @@ function renderField(def) {
 }
 
 function buildInputElement(def, isUnlocked) {
+  let value = "";
 
-let value = "";
+  const student = state.student;
 
-const student = state.student;
+  switch (def.key) {
+    case "fullName":
+      value = student.personalInfo?.arabFullName;
+      break;
 
+    case "nationalId":
+      value = student.personalInfo?.idNumber;
+      break;
 
-switch(def.key){
+    case "gender":
+      value = student.personalInfo?.gender;
+      break;
 
-case "fullName":
-value = student.personalInfo?.arabFullName;
-break;
+    case "birthDate":
+      value = student.personalInfo?.dob
+        ? new Date(student.personalInfo.dob).toISOString().substring(0, 10)
+        : "";
+      break;
 
+    case "governorate":
+      value = student.personalInfo?.governorate;
+      break;
 
-case "nationalId":
-value = student.personalInfo?.idNumber;
-break;
+    case "address":
+      value = student.personalInfo?.address;
+      break;
 
+    case "studentId":
+      value = student.accountInfo?.universityId;
+      break;
 
-case "gender":
-value = student.personalInfo?.gender;
-break;
+    case "department":
+      value = student.academicInfo?.department;
+      break;
 
+    case "level":
+      value = student.academicInfo?.level;
+      break;
 
-case "birthDate":
-value = student.personalInfo?.dob
- ? new Date(student.personalInfo.dob)
- .toISOString()
- .substring(0,10)
- : "";
-break;
+    case "enrollmentDate":
+      value = student.personalInfo?.dataEntryDate
+        ? new Date(student.personalInfo.dataEntryDate)
+            .toISOString()
+            .substring(0, 10)
+        : "";
+      break;
 
+    case "phone":
+      value = student.personalInfo?.phone;
+      break;
 
-case "governorate":
-value = student.personalInfo?.governorate;
-break;
+    case "email":
+      value = student.accountInfo?.email;
+      break;
 
+    case "guardianPhone":
+      value = student.familyInfo?.guardian?.guardianPhone || "";
+      break;
 
-case "address":
-value = student.personalInfo?.address;
-break;
+    case "fatherPhone":
+      value = student.familyInfo?.fatherPhone || "";
+      break;
+  }
 
+  let el;
 
-case "studentId":
-value = student.accountInfo?.universityId;
-break;
+  if (def.type === "select") {
+    el = document.createElement("select");
 
+    def.options.forEach((opt) => {
+      const option = document.createElement("option");
 
-case "department":
-value = student.academicInfo?.department;
-break;
+      option.value = opt.value;
+      option.textContent = opt.label;
 
+      el.appendChild(option);
+    });
 
-case "level":
-value = student.academicInfo?.level;
-break;
+    el.value = value || "";
+  } else {
+    el = document.createElement("input");
 
+    el.type = def.type;
+    el.value = value || "";
+  }
 
-case "enrollmentDate":
-value = student.personalInfo?.dataEntryDate
- ? new Date(student.personalInfo.dataEntryDate)
- .toISOString()
- .substring(0,10)
- : "";
-break;
+  el.id = `field_${def.key}`;
 
+  el.name = def.key;
 
-case "phone":
-value = student.personalInfo?.phone;
-break;
+  el.disabled = !isUnlocked;
 
-
-case "email":
-value = student.accountInfo?.email;
-break;
-
-case "guardianPhone":
-value = student.familyInfo?.guardian?.guardianPhone || "";
-break;
-
-
-case "fatherPhone":
-value = student.familyInfo?.fatherPhone || "";
-break;
-
-}
-
-
-
-let el;
-
-
-if(def.type==="select"){
-
-el=document.createElement("select");
-
-
-def.options.forEach(opt=>{
-
-const option=document.createElement("option");
-
-option.value=opt.value;
-option.textContent=opt.label;
-
-el.appendChild(option);
-
-});
-
-
-el.value=value || "";
-
-
-}else{
-
-el=document.createElement("input");
-
-el.type=def.type;
-el.value=value || "";
-
-}
-
-
-
-el.id=`field_${def.key}`;
-
-el.name=def.key;
-
-el.disabled=!isUnlocked;
-
-
-return el;
-
+  return el;
 }
 
 function escapeHtml(str) {
@@ -613,7 +546,7 @@ function showError(message) {
   document.getElementById("errorState").hidden = false;
 }
 
-//  Request-to-edit modal 
+//  Request-to-edit modal
 function initRequestModal() {
   const overlay = document.getElementById("requestOverlay");
   const close = () => {
@@ -690,7 +623,7 @@ function approveDemoRequest(field) {
   showToast("تمت الموافقة على الحقل (محاكاة تجريبية)");
 }
 
-//  Save form 
+//  Save form
 function initFormSubmit() {
   document.getElementById("editForm").addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -706,22 +639,20 @@ function initFormSubmit() {
     saveBtn.disabled = true;
     saveBtn.innerHTML =
       '<i class="fa-solid fa-spinner fa-spin"></i> جاري الحفظ...';
-            try {
-  await saveStudentChanges(state.studentId, payload);
+    try {
+      await saveStudentChanges(state.studentId, payload);
 
-  showToast("تم حفظ التعديلات بنجاح", "success");
+      showToast("تم حفظ التعديلات بنجاح", "success");
 
-  setTimeout(() => {
-    window.location.href =
-      `${PROFILE_URL_BASE}?id=${state.studentId}`;
-  }, 1000);
-
-} catch (err) {
-  showToast(err.message || "تعذر حفظ التعديلات", "error");
-} finally {
-  saveBtn.disabled = false;
-  saveBtn.innerHTML = originalHtml;
-}
+      setTimeout(() => {
+        window.location.href = `${PROFILE_URL_BASE}?id=${state.studentId}`;
+      }, 1000);
+    } catch (err) {
+      showToast(err.message || "تعذر حفظ التعديلات", "error");
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = originalHtml;
+    }
   });
 }
 
