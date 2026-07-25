@@ -128,24 +128,41 @@
         <button class="modal__close" id="requestModalClose" aria-label="إغلاق">
           <i class="fa-solid fa-xmark"></i>
         </button>
-        <h2 class="modal__title">طلب تعديل بيانات</h2>
+              <h2 class="modal__title">طلب تعديل بيانات</h2>
         <p class="modal__text">
-          هيتم إرسال طلبك للإدارة للموافقة على تعديل هذا الحقل.
+          سيتم إرسال طلبك للإدارة للموافقة على تعديل هذا الحقل
         </p>
 
         <div class="modal__field">
           <label>الحقل المطلوب تعديله</label>
-          <input type="text" id="requestFieldLabel" disabled />
+          <input
+            type="text"
+            placeholder="اسم الطالب رباعي (عربي)"
+            id="requestFieldLabel"
+          />
         </div>
 
         <div class="modal__field">
-          <label>سبب التعديل (اختياري)</label>
+          <label>التعديل المطلوب تغييره</label>
+          <input
+            type="text"
+            placeholder="أكتب هنا البيانات الصحيحة"
+            id="requestFieldLabel"
+          />
+        </div>
+
+        <div class="modal__field">
+          <label>سبب التعديل</label>
           <textarea
             id="requestReason"
-            placeholder="اكتبي سبب طلب التعديل..."
+            placeholder="اكتب سبب طلب التعديل..."
           ></textarea>
         </div>
 
+        <div class="modal__field">
+          <label> مرفقات</label>
+          <input type="file" id="requestFieldLabel" />
+        </div>
         <div class="modal__actions">
           <button class="btn btn--primary" id="submitRequestBtn">
             <i class="fa-solid fa-paper-plane"></i> إرسال الطلب
