@@ -69,40 +69,18 @@
           <span id="errorMessage">تعذر إيجاد بيانات الطالب</span>
         </div>
 
-        <div class="notice" id="infoNotice" hidden>
-          <div class="notice__icon">
-            <i class="fa-solid fa-circle-info"></i>
-          </div>
-          <div>
-            <h3 class="notice__title">ملاحظة</h3>
-            <p class="notice__text">
-              البيانات المميزة بأيقونة
-              <span class="icon-style"> <i class="fa-solid fa-lock"></i></span>
-              لا يمكن تعديلها مباشرة. اضغطي على زر الطلب
-              <span class="icon-style"
-                ><i class="fa-solid fa-paper-plane"></i
-              ></span>
-              بجانب الحقل لإرسال طلب تعديل للإدارة، وبمجرد الموافقة هيبقى الحقل
-              قابل للتعديل.
-            </p>
-          </div>
-        </div>
-
         <form class="form-card" id="editForm" hidden novalidate>
           <div class="form-card__banner"></div>
 
           <div class="form-card__header">
             <div class="form-card__photo-wrap">
               <img class="form-card__photo" id="studentPhoto" alt="" />
-              <button
-                type="button"
-                class="photo-request-btn"
-                id="photoRequestBtn"
-                title="طلب تغيير الصورة"
-                aria-label="طلب تغيير الصورة"
-              >
-                <i class="fa-solid fa-camera"></i>
-              </button>
+                <button type="button" class="photo-request-btn" id="photoChangeBtn"
+             title="تغيير الصورة" aria-label="تغيير الصورة">
+                 <i class="fa-solid fa-camera"></i>
+            </button>
+
+         <input type="file" id="photoInput" accept="image/*" hidden />
             </div>
             <div class="form-card__heading">
               <h2 class="form-card__name" id="studentName"></h2>
@@ -152,38 +130,20 @@
         </button>
         <h2 class="modal__title">طلب تعديل بيانات</h2>
         <p class="modal__text">
-          سيتم إرسال طلبك للإدارة للموافقة على تعديل هذا الحقل
+          هيتم إرسال طلبك للإدارة للموافقة على تعديل هذا الحقل.
         </p>
 
         <div class="modal__field">
           <label>الحقل المطلوب تعديله</label>
-          <input
-            type="text"
-            placeholder="اسم الطالب رباعي (عربي)"
-            id="requestFieldLabel"
-          />
+          <input type="text" id="requestFieldLabel" disabled />
         </div>
 
         <div class="modal__field">
-          <label>التعديل المطلوب تغييره</label>
-          <input
-            type="text"
-            placeholder="أكتب هنا البيانات الصحيحة"
-            id="requestFieldLabel"
-          />
-        </div>
-
-        <div class="modal__field">
-          <label>سبب التعديل</label>
+          <label>سبب التعديل (اختياري)</label>
           <textarea
             id="requestReason"
-            placeholder="اكتب سبب طلب التعديل..."
+            placeholder="اكتبي سبب طلب التعديل..."
           ></textarea>
-        </div>
-
-        <div class="modal__field">
-          <label> مرفقات</label>
-          <input type="file" id="requestFieldLabel" />
         </div>
 
         <div class="modal__actions">
@@ -196,8 +156,8 @@
     </div>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
+     
     <script src="./config.js"></script>
-
     <script src="./studentEditForm.js"></script>
   </body>
 </html>
