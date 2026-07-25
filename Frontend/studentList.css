@@ -540,6 +540,10 @@ select {
   font-weight: 600;
 }
 
+.table-loading[hidden] {
+  display: none;
+}
+
 .spinner {
   width: 22px;
   height: 22px;
