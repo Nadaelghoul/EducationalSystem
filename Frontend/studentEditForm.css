@@ -253,41 +253,6 @@ textarea {
   display: none;
 }
 
-.notice {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-  padding: 18px 24px;
-  border-radius: var(--radius-lg);
-  margin-bottom: 20px;
-  background: var(--blue-50);
-  border: 1px solid var(--border);
-}
-.notice__icon {
-  flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--blue-600);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-}
-.notice__title {
-  margin: 0 0 4px;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--blue-700);
-}
-.notice__text {
-  margin: 0;
-  font-size: 14px;
-  color: var(--text-600);
-  line-height: 1.6;
-}
-
 .form-card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -377,6 +342,52 @@ textarea {
 
 .field {
   min-width: 0;
+  position: relative;
+}
+
+.field--locked .field__label {
+  cursor: help;
+}
+.field--locked input,
+.field--locked select {
+  cursor: help;
+}
+
+.field-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  width: max-content;
+  max-width: 260px;
+  background: var(--navy-950);
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.6;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+  z-index: 20;
+  pointer-events: none;
+}
+.field-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  right: 16px;
+  border: 6px solid transparent;
+  border-top-color: var(--navy-950);
+}
+.field--locked:hover .field-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }
 .field__label {
   display: flex;
@@ -630,8 +641,4 @@ textarea {
     width: 100%;
     justify-content: center;
   }
-}
-
-.icon-style {
-  margin: 0 5px;
 }
