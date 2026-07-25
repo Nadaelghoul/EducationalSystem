@@ -94,22 +94,22 @@
                 />
               </div>
 
-             <select id="filterDepartment">
-              <option value="">كل الأقسام</option>
-             <option value="علوم الحاسب"> علوم الحاسب</option>
-            <option value="نظم المعلومات"> نظم المعلومات </option>
-            <option value="هندسة البرمجيات"> هندسة البرمجيات</option>
-           <option value="تكنولوجيا المعلومات"> تكنولوجيا المعلومات</option>
-         </select>
+              <select id="filterDepartment">
+                <option value="">كل الأقسام</option>
+                <option value="علوم الحاسب">علوم الحاسب</option>
+                <option value="نظم المعلومات">نظم المعلومات</option>
+                <option value="هندسة البرمجيات">هندسة البرمجيات</option>
+                <option value="تكنولوجيا المعلومات">تكنولوجيا المعلومات</option>
+              </select>
 
-          <select id="filterLevel">
-           <option value="">كل المستويات </option>
-           <option value="الأول">المستوى الأول</option>
-          <option value="الثاني">المستوى الثاني</option>
-          <option value="الثالث">المستوى الثالث</option>
-          <option value="الرابع">المستوى الرابع</option>
-          <option value="الخامس">المستوى الخامس</option>
-          </select>
+              <select id="filterLevel">
+                <option value="">كل المستويات</option>
+                <option value="الأول">المستوى الأول</option>
+                <option value="الثاني">المستوى الثاني</option>
+                <option value="الثالث">المستوى الثالث</option>
+                <option value="الرابع">المستوى الرابع</option>
+                <option value="الخامس">المستوى الخامس</option>
+              </select>
 
               <select id="filterStatus">
                 <option value="">كل الحالات</option>
@@ -138,10 +138,12 @@
                   </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
-                <div id="loadingStudents" class="table-empty" hidden>
-                   جاري تحميل بيانات الطلاب...
-                </div>
               </table>
+
+              <div class="table-loading" id="loadingStudents" hidden>
+                <span class="spinner" aria-hidden="true"></span>
+                <span>جاري تحميل بيانات الطلاب...</span>
+              </div>
 
               <div class="table-empty" id="tableEmpty" hidden>
                 لاتوجد نتائج مطابقة للبحث
