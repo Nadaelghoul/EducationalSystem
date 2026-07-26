@@ -399,7 +399,6 @@ document.getElementById("studentIdText").textContent =
     });
   });
 
-  document.getElementById("infoNotice").hidden = false;
   document.getElementById("editForm").hidden = false;
 }
 
@@ -411,6 +410,7 @@ function renderField(def) {
 
   const wrap = document.createElement("div");
   wrap.className = "field";
+  if (!isUnlocked) wrap.classList.add("field--locked");
 
   const label = document.createElement("div");
   label.className = "field__label";
@@ -421,6 +421,19 @@ function renderField(def) {
 
   const row = document.createElement("div");
   row.className = "field__input-row";
+
+  if (!isUnlocked) {
+    const tooltip = document.createElement("div");
+    tooltip.className = "field-tooltip";
+    tooltip.innerHTML = `
+      <div class="field-tooltip__icon"><i class="fa-solid fa-lock"></i></div>
+      <div class="field-tooltip__body">
+        <strong class="field-tooltip__title">يتطلب موافقة الإدارة</strong>
+        <p class="field-tooltip__text">هذا الحقل غير قابل للتعديل مباشرة. اضغط على زر الطلب لإرسال طلب تعديل للإدارة، وبمجرد الموافقة علية سيكون الحقل قابل للتعديل.</p>
+      </div>
+    `;
+    wrap.appendChild(tooltip);
+  }
 
   const input = buildInputElement(def, isUnlocked);
   row.appendChild(input);
