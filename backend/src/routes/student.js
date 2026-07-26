@@ -130,7 +130,7 @@ payload.accountInfo = {
     payload.academicInfo = {
       ...(payload.academicInfo || {}),
       level: "الأول",
-      department: "",
+      department: "علوم الحاسب",
     };
 
     const existingStudent = await Student.findOne({

@@ -173,7 +173,7 @@ const studentSchema = new mongoose.Schema(
       department: {
         type: String,
         enum: ["علوم الحاسب", "نظم المعلومات", "هندسة البرمجيات", "تكنولوجيا المعلومات"],
-        default:null,
+        default:"علوم الحاسب",
       },
 
       oneChanceStudent: {
