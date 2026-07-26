@@ -429,7 +429,7 @@ function renderField(def) {
       <div class="field-tooltip__icon"><i class="fa-solid fa-lock"></i></div>
       <div class="field-tooltip__body">
         <strong class="field-tooltip__title">يتطلب موافقة الإدارة</strong>
-        <p class="field-tooltip__text">هذا الحقل غير قابل للتعديل مباشرة. اضغط على زر الطلب لإرسال طلب تعديل للإدارة، وبمجرد الموافقة هيبقى الحقل قابل للتعديل.</p>
+        <p class="field-tooltip__text">هذا الحقل غير قابل للتعديل مباشرة. اضغط على زر الطلب لإرسال طلب تعديل للإدارة، وبمجرد الموافقة علية سيكون الحقل قابل للتعديل.</p>
       </div>
     `;
     wrap.appendChild(tooltip);
