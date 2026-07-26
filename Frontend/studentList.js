@@ -497,8 +497,8 @@ student.academicInfo.level
   }">
     ${
       student.accountInfo.status === "active"
-        ? "مُفعل"
-        : "غير مُفعل"
+        ? "مقيد"
+        : "غير مقيد"
     }
   </span>
 </td>
@@ -650,8 +650,8 @@ async function updateStudentStatus(id, status) {
 
     showToast(
       status === "active"
-        ? "تم تفعيل الطالب"
-        : "تم إلغاء تفعيل الطالب"
+        ? "الطالب مقيد"
+        : "الطالب غير مقيد"
     );
 
   } catch {
