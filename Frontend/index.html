@@ -113,8 +113,8 @@
 
               <select id="filterStatus">
                 <option value="">كل الحالات</option>
-                <option value="active">مقيد</option>
-                <option value="inactive">غير مقيد</option>
+                <option value="active">فعّال</option>
+                <option value="inactive">غير فعّال</option>
               </select>
 
               <button class="btn btn--outline" id="filterBtn">
@@ -141,7 +141,9 @@
               </table>
 
               <div class="table-loading" id="loadingStudents" hidden>
-                <span class="spinner" aria-hidden="true"></span>
+                <div class="dot-spinner" aria-hidden="true">
+                  <span></span><span></span><span></span>
+                </div>
                 <span>جاري تحميل بيانات الطلاب...</span>
               </div>
 
